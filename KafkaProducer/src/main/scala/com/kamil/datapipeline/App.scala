@@ -15,7 +15,7 @@ object App {
 
     val TOPIC="test"
 
-    for(i<- 1 to 50){
+    for(i<- 1 to 5000){
       val record = new ProducerRecord(TOPIC, "key", s"hello $i")
       producer.send(record)
     }
