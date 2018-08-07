@@ -6,6 +6,17 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import com.metamx.tranquility.spark.BeamRDD._
+import com.kamil.datapipeline.DruidIntegration
+import com.metamx.common.Granularity
+import com.metamx.tranquility.beam.{Beam, ClusteredBeamTuning}
+import com.metamx.tranquility.druid.{DruidBeams, DruidLocation, DruidRollup, SpecificDruidDimensions}
+import com.metamx.tranquility.spark.BeamFactory
+import io.druid.granularity.QueryGranularities
+import io.druid.query.aggregation.LongSumAggregatorFactory
+import org.apache.curator.framework.CuratorFrameworkFactory
+import org.apache.curator.retry.BoundedExponentialBackoffRetry
+import org.joda.time.DateTime
 
 object App {
   def main(args: Array[String]): Unit = {
@@ -24,7 +35,6 @@ object App {
     val sc = new SparkContext(conf)
     val ssc = new StreamingContext(sc, Seconds(1))
 
-
     val stream = KafkaUtils.createDirectStream[String, String](
       ssc,
       PreferConsistent,
@@ -39,7 +49,7 @@ object App {
       rdd.foreach((record) => println(record.value()))
       val offsetRanges = rdd.asInstanceOf[HasOffsetRanges].offsetRanges
       stream.asInstanceOf[CanCommitOffsets].commitAsync(offsetRanges)
-
+      rdd.propagate(new DruidIntegration)
     })
 
     ssc.start()
