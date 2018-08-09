@@ -15,9 +15,10 @@ object App {
 
     val TOPIC="test"
 
-    for(i<- 1 to 5000){
+    for(i<- 1 to 50){
       val record = new ProducerRecord(TOPIC, "key", s"hello $i")
       producer.send(record)
+      Thread.sleep(1000);
     }
 
     val record = new ProducerRecord(TOPIC, "key", "the end "+new java.util.Date)

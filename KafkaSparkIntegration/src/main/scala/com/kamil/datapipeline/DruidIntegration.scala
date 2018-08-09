@@ -39,7 +39,7 @@ object DruidIntegration
     // Expects simpleEvent.timestamp to return a Joda DateTime object.
 
     DruidBeams
-      .builder((message: ConsumerRecord[String, String]) => new DateTime("12.01.10 00:00:00"))
+      .builder((message: ConsumerRecord[String, String]) => new DateTime())
       .curator(curator)
       .discoveryPath(discoveryPath)
       .location(DruidLocation(indexService, "",dataSource))
@@ -52,6 +52,8 @@ object DruidIntegration
         )
       )
       .buildBeam()
+
+    print("dfsd")
   }
 }
 
